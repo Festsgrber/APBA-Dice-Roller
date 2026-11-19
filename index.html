@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>APBA Dice Roller</title>
+
+<style>
+
+body{
+    text-align:center;
+    font-family:Arial, sans-serif;
+    background-color:#1b5e20;
+    color:white;
+    margin-top:50px;
+}
+
+h1{
+    margin-bottom:30px;
+}
+
+#diceContainer{
+    margin-bottom:30px;
+}
+
+#redDie{
+    width:200px;
+}
+
+#whiteDie{
+    width:150px;
+    margin-left:20px;
+    vertical-align:middle;
+}
+
+button{
+    font-size:24px;
+    padding:15px 25px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background-color:#dddddd;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>⚾ APBA Dice Roller</h1>
+
+<div id="diceContainer">
+
+<img id="redDie"
+     src="images/red1.png">
+
+<img id="whiteDie"
+     src="images/white1.png">
+
+</div>
+
+<button onclick="rollDice()">
+Roll Dice
+</button>
+
+<script>
+
+function rollDice()
+{
+    let red =
+      Math.floor(Math.random()*6)+1;
+
+    let white =
+      Math.floor(Math.random()*6)+1;
+
+    document.getElementById("redDie").src =
+      "images/red" + red + ".png";
+
+    document.getElementById("whiteDie").src =
+      "images/white" + white + ".png";
+}
+
+</script>
+
+</body>
+
+</html>

@@ -8,53 +8,6 @@
 
 <style>
 
-let tapCount = 0;
-
-let tapTimer = null;
-
-body{
-    background:#101010;
-    color:white;
-    font-family:Arial,sans-serif;
-    text-align:center;
-    margin:20px;
-}
-
-#secretBall{
-    cursor:pointer;
-    user-select:none;
-}
-
-#progressContainer{
-
-    width:70%;
-
-    height:12px;
-
-    margin:10px auto 20px auto;
-
-    background:#222;
-
-    border:1px solid #555;
-
-    border-radius:8px;
-
-    overflow:hidden;
-
-    display:none;
-}
-
-#progressBar{
-
-    width:0%;
-
-    height:100%;
-
-    background:#2196f3;
-
-    transition:width .05s linear;
-}
-
 #fieldArea{
     width:90%;
     margin:40px auto;
@@ -275,6 +228,53 @@ Export CSV
 <div id="comboTable"></div>
 
 <script>
+
+let tapCount = 0;
+
+let tapTimer = null;
+
+body{
+    background:#101010;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin:20px;
+}
+
+#secretBall{
+    cursor:pointer;
+    user-select:none;
+}
+
+#progressContainer{
+
+    width:70%;
+
+    height:12px;
+
+    margin:10px auto 20px auto;
+
+    background:#222;
+
+    border:1px solid #555;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    display:none;
+}
+
+#progressBar{
+
+    width:0%;
+
+    height:100%;
+
+    background:#2196f3;
+
+    transition:width .05s linear;
+}
 
 const rollSound =
 new Audio("sounds/dice-roll.mp3");

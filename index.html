@@ -201,6 +201,14 @@ No rolls yet.
 Clear Log
 </button>
 
+<button onclick="resetStats()">
+Reset Statistics
+</button>
+
+<button onclick="exportCSV()">
+Export CSV
+</button>
+
 <br><br>
 
 <div id="comboTable"></div>
@@ -211,6 +219,8 @@ const rollSound =
 new Audio("sounds/dice-roll.mp3");
 
 let rollHistory = [];
+
+let csvHistory = [];
 
 let totalRolls = 0;
 
@@ -359,6 +369,13 @@ function recordRoll(red,white)
     const timestamp =
         formatTime();
 
+csvHistory.unshift({
+    time: timestamp,
+    red: red,
+    white: white,
+    combo: red + "-" + white
+});
+
     rollHistory.unshift(
       "<span class='timestamp'>" +
       timestamp +
@@ -473,6 +490,102 @@ function clearLog()
         "logTicker"
     ).innerHTML =
         "No rolls yet.";
+}
+
+function resetStats()
+{
+    if(
+        !confirm(
+        "Reset all statistics and roll history?"
+        )
+    )
+    {
+        return;
+    }
+
+    totalRolls = 0;
+
+    redTotal = 0;
+
+    whiteTotal = 0;
+
+    rollHistory = [];
+
+    csvHistory = [];
+
+    for(let r=1;r<=6;r++)
+    {
+        for(let w=1;w<=6;w++)
+        {
+            comboStats[
+                r + "-" + w
+            ] = 0;
+        }
+    }
+
+    document.getElementById(
+        "logTicker"
+    ).innerHTML =
+        "No rolls yet.";
+
+    document.getElementById(
+        "totalRolls"
+    ).innerText = "0";
+
+    document.getElementById(
+        "redAverage"
+    ).innerText = "0.00";
+
+    document.getElementById(
+        "whiteAverage"
+    ).innerText = "0.00";
+
+    updateComboTable();
+
+    alert(
+        "Statistics reset."
+    );
+}
+
+function exportCSV()
+{
+    let csv =
+        "Timestamp,Red Die,White Die,Combination\n";
+
+    csvHistory.forEach(function(row)
+    {
+        csv +=
+            '"' + row.time + '",' +
+            row.red + "," +
+            row.white + "," +
+            '"' + row.combo + '"' +
+            "\n";
+    });
+
+    const blob =
+        new Blob(
+            [csv],
+            { type: "text/csv" }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "APBA_Roll_History.csv";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
 }
 
 document.getElementById(

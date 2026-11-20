@@ -24,17 +24,18 @@ h1{
     background-image:url('images/baseball-field.jpg');
 
     background-size:cover;
-    background-position:bottom;
+    background-position:bottom
+;
 
     width:90%;
 
     margin-left:auto;
     margin-right:auto;
 
-    margin-top:10px;
+    margin-top:50px;
 
-    padding-top:90px;
-    padding-bottom:90px;
+    padding-top:80px;
+    padding-bottom:80px;
 
     border-radius:20px;
 
@@ -45,14 +46,13 @@ h1{
 
     background-color:rgba(0,0,0,.35);
 
-    padding-top:20px;
-    padding-bottom:20px;
+    padding-top:30px;
+    padding-bottom:30px;
 
     border-radius:20px;
 }
 
 #diceContainer{
-
     margin-bottom:30px;
 }
 
@@ -80,7 +80,7 @@ h1{
 
 button{
 
-    font-size:24px;
+    font-size:20px;
 
     padding:12px 24px;
 
@@ -89,15 +89,15 @@ button{
     border-radius:10px;
 
     cursor:pointer;
+
+    margin:5px;
 }
 
 button:hover{
-
     background-color:#dddddd;
 }
 
 label{
-
     font-size:18px;
 }
 
@@ -124,8 +124,42 @@ label{
     }
 }
 
-.rolling {
-    animation: rollAnimation 2.5s ease;
+.rolling{
+    animation: rollAnimation .5s ease;
+}
+
+/* Bottom Scoreboard Log */
+
+#logWrapper{
+
+    width:95%;
+    margin:30px auto;
+
+    background:black;
+
+    border:2px solid #444;
+
+    border-radius:10px;
+
+    padding:10px;
+
+    overflow:hidden;
+}
+
+#logTicker{
+
+    white-space:nowrap;
+
+    font-size:20px;
+
+    color:white;
+
+    text-align:left;
+}
+
+.timestamp{
+    color:yellow;
+    font-weight:bold;
 }
 
 </style>
@@ -164,19 +198,70 @@ Sound Effects
 <br><br>
 
 <button onclick="rollDice()">
-
 Roll Dice
-
 </button>
 
 </div>
 
 </div>
 
+<div id="logWrapper">
+    <div id="logTicker">
+        No rolls yet.
+    </div>
+</div>
+
+<button onclick="clearLog()">
+Clear Log
+</button>
+
 <script>
 
 const rollSound =
 new Audio("sounds/dice-roll.mp3");
+
+let rollHistory = [];
+
+const soundToggle =
+document.getElementById("soundToggle");
+
+soundToggle.checked =
+localStorage.getItem("soundEnabled")
+!== "false";
+
+soundToggle.addEventListener(
+"change",
+function()
+{
+    localStorage.setItem(
+        "soundEnabled",
+        soundToggle.checked
+    );
+});
+
+function formatTime()
+{
+    const now = new Date();
+
+    return now.toLocaleTimeString(
+        [],
+        {
+            hour:'numeric',
+            minute:'2-digit',
+            second:'2-digit'
+        }
+    );
+}
+
+function updateLog()
+{
+    document.getElementById(
+        "logTicker"
+    ).innerHTML =
+        rollHistory.join(
+            " &nbsp;&nbsp;&nbsp; ⚾ &nbsp;&nbsp;&nbsp; "
+        );
+}
 
 function rollDice()
 {
@@ -189,22 +274,20 @@ function rollDice()
     redDie.classList.add("rolling");
     whiteDie.classList.add("rolling");
 
-    if(document.getElementById("soundToggle").checked)
+    if(soundToggle.checked)
     {
         rollSound.currentTime = 0;
         rollSound.play();
     }
 
-    let animationCounter = 0;
-
     const rolling =
         setInterval(function(){
 
             let tempRed =
-                Math.floor(Math.random() * 6) + 1;
+                Math.floor(Math.random()*6)+1;
 
             let tempWhite =
-                Math.floor(Math.random() * 6) + 1;
+                Math.floor(Math.random()*6)+1;
 
             redDie.src =
                 "images/red" + tempRed + ".png";
@@ -212,19 +295,17 @@ function rollDice()
             whiteDie.src =
                 "images/white" + tempWhite + ".png";
 
-            animationCounter++;
-
-        },75);
+        },100);
 
     setTimeout(function(){
 
         clearInterval(rolling);
 
         let finalRed =
-            Math.floor(Math.random() * 6) + 1;
+            Math.floor(Math.random()*6)+1;
 
         let finalWhite =
-            Math.floor(Math.random() * 6) + 1;
+            Math.floor(Math.random()*6)+1;
 
         redDie.src =
             "images/red" + finalRed + ".png";
@@ -232,10 +313,39 @@ function rollDice()
         whiteDie.src =
             "images/white" + finalWhite + ".png";
 
+        const timestamp =
+            formatTime();
+
+        rollHistory.unshift(
+            "<span class='timestamp'>" +
+            timestamp +
+            "</span> " +
+            finalRed +
+            "-" +
+            finalWhite
+        );
+
+        if(rollHistory.length > 25)
+        {
+            rollHistory.pop();
+        }
+
+        updateLog();
+
         redDie.classList.remove("rolling");
         whiteDie.classList.remove("rolling");
 
-    },600);
+    },1500);
+}
+
+function clearLog()
+{
+    rollHistory = [];
+
+    document.getElementById(
+        "logTicker"
+    ).innerHTML =
+        "No rolls yet.";
 }
 
 </script>

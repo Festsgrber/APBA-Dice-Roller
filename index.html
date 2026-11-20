@@ -6,6 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+let tapCount = 0;
+
+let tapTimer = null;
+
 <style>
 
 body{
@@ -19,6 +23,36 @@ body{
 #secretBall{
     cursor:pointer;
     user-select:none;
+}
+
+#progressContainer{
+
+    width:70%;
+
+    height:12px;
+
+    margin:10px auto 20px auto;
+
+    background:#222;
+
+    border:1px solid #555;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    display:none;
+}
+
+#progressBar{
+
+    width:0%;
+
+    height:100%;
+
+    background:#2196f3;
+
+    transition:width .05s linear;
 }
 
 #fieldArea{
@@ -122,6 +156,27 @@ td{
 
 </style>
 
+function launchAutoRollPrompt()
+{
+    const count =
+        parseInt(
+            prompt(
+                "Number of rolls?"
+            )
+        );
+
+    if(
+        isNaN(count)
+        ||
+        count < 1
+    )
+    {
+        return;
+    }
+
+    autoRoll(count);
+}
+
 </head>
 
 <body>
@@ -130,6 +185,12 @@ td{
 <span id="secretBall">⚾</span>
 APBA Dice Roller
 </h1>
+
+<div id="progressContainer">
+
+    <div id="progressBar"></div>
+
+</div>
 
 <div id="fieldArea">
 
@@ -466,18 +527,72 @@ function rollDice()
     },750);
 }
 
-function autoRoll(count)
+async function autoRoll(count)
 {
-    for(let i=0;i<count;i++)
+    const progressContainer =
+        document.getElementById(
+            "progressContainer"
+        );
+
+    const progressBar =
+        document.getElementById(
+            "progressBar"
+        );
+
+    progressContainer.style.display =
+        "block";
+
+    progressBar.style.width =
+        "0%";
+
+    const batchSize = 1000;
+
+    for(
+        let i = 0;
+        i < count;
+        i++
+    )
     {
         recordRoll(
             rollSecureDie(),
             rollSecureDie()
         );
+
+        if(
+            i % batchSize === 0
+        )
+        {
+            const percent =
+                ((i + 1)
+                / count)
+                * 100;
+
+            progressBar.style.width =
+                percent + "%";
+
+            await new Promise(
+                resolve =>
+                setTimeout(
+                    resolve,
+                    1
+                )
+            );
+        }
     }
 
+    progressBar.style.width =
+        "100%";
+
+    setTimeout(function(){
+
+        progressContainer.style.display =
+            "none";
+
+    },1000);
+
     alert(
-        count.toLocaleString() +
+        count.toLocaleString()
+        +
         " rolls completed."
     );
 }
@@ -595,29 +710,31 @@ document.getElementById(
     function(event)
     {
         if(
-            !event.ctrlKey ||
-            !event.shiftKey
+            event.ctrlKey &&
+            event.shiftKey
         )
         {
+            launchAutoRollPrompt();
             return;
         }
 
-        const count =
-        parseInt(
-            prompt(
-                "Number of rolls?"
-            )
-        );
+        tapCount++;
 
-        if(
-            isNaN(count) ||
-            count < 1
-        )
+        clearTimeout(tapTimer);
+
+        tapTimer =
+            setTimeout(function(){
+
+                tapCount = 0;
+
+            },1000);
+
+        if(tapCount === 3)
         {
-            return;
-        }
+            tapCount = 0;
 
-        autoRoll(count);
+            launchAutoRollPrompt();
+        }
     }
 );
 

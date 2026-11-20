@@ -1,12 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>APBA Dice Roller</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
+
+body{
+    background:#101010;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin:20px;
+}
+
+#secretBall{
+    cursor:pointer;
+    user-select:none;
+}
+
+#progressContainer{
+    width:70%;
+    height:12px;
+    margin:10px auto 20px auto;
+    background:#222;
+    border:1px solid #555;
+    border-radius:8px;
+    overflow:hidden;
+    display:none;
+}
+
+#progressBar{
+    width:0%;
+    height:100%;
+    background:#2196f3;
+}
 
 #fieldArea{
     width:90%;
@@ -108,28 +138,6 @@ td{
 }
 
 </style>
-
-function launchAutoRollPrompt()
-{
-    const count =
-        parseInt(
-            prompt(
-                "Number of rolls?"
-            )
-        );
-
-    if(
-        isNaN(count)
-        ||
-        count < 1
-    )
-    {
-        return;
-    }
-
-    autoRoll(count);
-}
-
 </head>
 
 <body>
@@ -140,44 +148,28 @@ APBA Dice Roller
 </h1>
 
 <div id="progressContainer">
-
     <div id="progressBar"></div>
-
 </div>
 
 <div id="fieldArea">
 
 <div id="overlay">
 
-<div>
-
 <img id="redDie" src="images/red1.png">
-
 <img id="whiteDie" src="images/white1.png">
 
-</div>
-
-<br>
+<br><br>
 
 <label>
-
-<input
-type="checkbox"
-id="soundToggle"
-checked>
-
+<input type="checkbox" id="soundToggle" checked>
 Sound Effects
-
 </label>
 
 <br><br>
 
-<button onclick="rollDice()">
-Roll Dice
-</button>
+<button onclick="rollDice()">Roll Dice</button>
 
 </div>
-
 </div>
 
 <div id="statsPanel">
@@ -202,26 +194,14 @@ White Average:
 </div>
 
 <div id="logWrapper">
-
 <div id="logTicker">
-
 No rolls yet.
-
+</div>
 </div>
 
-</div>
-
-<button onclick="clearLog()">
-Clear Log
-</button>
-
-<button onclick="resetStats()">
-Reset Statistics
-</button>
-
-<button onclick="exportCSV()">
-Export CSV
-</button>
+<button onclick="clearLog()">Clear Log</button>
+<button onclick="resetStats()">Reset Statistics</button>
+<button onclick="exportCSV()">Export CSV</button>
 
 <br><br>
 
@@ -230,72 +210,23 @@ Export CSV
 <script>
 
 let tapCount = 0;
-
 let tapTimer = null;
-
-body{
-    background:#101010;
-    color:white;
-    font-family:Arial,sans-serif;
-    text-align:center;
-    margin:20px;
-}
-
-#secretBall{
-    cursor:pointer;
-    user-select:none;
-}
-
-#progressContainer{
-
-    width:70%;
-
-    height:12px;
-
-    margin:10px auto 20px auto;
-
-    background:#222;
-
-    border:1px solid #555;
-
-    border-radius:8px;
-
-    overflow:hidden;
-
-    display:none;
-}
-
-#progressBar{
-
-    width:0%;
-
-    height:100%;
-
-    background:#2196f3;
-
-    transition:width .05s linear;
-}
 
 const rollSound =
 new Audio("sounds/dice-roll.mp3");
 
 let rollHistory = [];
-
 let csvHistory = [];
 
 let totalRolls = 0;
-
 let redTotal = 0;
-
 let whiteTotal = 0;
 
 const comboStats = {};
 
-for(let r=1;r<=6;r++)
-{
-    for(let w=1;w<=6;w++)
-    {
-        comboStats[r + "-" + w] = 0;
+for(let r=1;r<=6;r++){
+    for(let w=1;w<=6;w++){
+        comboStats[r+"-"+w]=0;
     }
 }
 
@@ -308,32 +239,49 @@ localStorage.getItem("soundEnabled")
 
 soundToggle.addEventListener(
 "change",
-function()
-{
+function(){
     localStorage.setItem(
         "soundEnabled",
         soundToggle.checked
     );
 });
 
-function rollSecureDie()
-{
+function launchAutoRollPrompt(){
+
+    const count =
+        parseInt(
+            prompt(
+                "Number of rolls?"
+            )
+        );
+
+    if(
+        isNaN(count)
+        ||
+        count < 1
+    ){
+        return;
+    }
+
+    autoRoll(count);
+}
+
+function rollSecureDie(){
+
     const limit =
         Math.floor(
-            4294967296 / 6
-        ) * 6;
+            4294967296/6
+        )*6;
 
     const array =
         new Uint32Array(1);
 
-    while(true)
-    {
-        window.crypto.getRandomValues(
-            array
-        );
+    while(true){
 
-        if(array[0] < limit)
-        {
+        window.crypto.getRandomValues(array);
+
+        if(array[0] < limit){
+
             return (
                 array[0] % 6
             ) + 1;
@@ -341,63 +289,59 @@ function rollSecureDie()
     }
 }
 
-function formatTime()
-{
+function formatTime(){
     return new Date()
         .toLocaleTimeString();
 }
 
-function updateStats()
-{
+function updateStats(){
+
     document.getElementById(
         "totalRolls"
     ).innerText =
         totalRolls;
 
-    if(totalRolls > 0)
-    {
-        document.getElementById(
-            "redAverage"
-        ).innerText =
-        (redTotal /
-         totalRolls)
-         .toFixed(2);
+    document.getElementById(
+        "redAverage"
+    ).innerText =
+        totalRolls
+        ? (redTotal/totalRolls)
+            .toFixed(2)
+        : "0.00";
 
-        document.getElementById(
-            "whiteAverage"
-        ).innerText =
-        (whiteTotal /
-         totalRolls)
-         .toFixed(2);
-    }
+    document.getElementById(
+        "whiteAverage"
+    ).innerText =
+        totalRolls
+        ? (whiteTotal/totalRolls)
+            .toFixed(2)
+        : "0.00";
 }
 
-function updateLog()
-{
+function updateLog(){
+
     document.getElementById(
         "logTicker"
     ).innerHTML =
         rollHistory.join(
-            "&nbsp;&nbsp;⚾&nbsp;&nbsp;"
+            " &nbsp;⚾&nbsp; "
         );
 }
 
-function updateComboTable()
-{
+function updateComboTable(){
+
     let html =
     "<h2>Combination Frequency</h2><table>";
 
-    for(let r=1;r<=6;r++)
-    {
+    for(let r=1;r<=6;r++){
+
         html += "<tr>";
 
-        for(let w=1;w<=6;w++)
-        {
+        for(let w=1;w<=6;w++){
+
             html +=
             "<td>" +
-            r +
-            "-" +
-            w +
+            r + "-" + w +
             "<br>" +
             comboStats[
             r+"-"+w] +
@@ -415,39 +359,38 @@ function updateComboTable()
         html;
 }
 
-function recordRoll(red,white)
-{
+function recordRoll(red,white){
+
     totalRolls++;
-
     redTotal += red;
-
     whiteTotal += white;
 
     comboStats[
-        red + "-" + white
+        red+"-"+white
     ]++;
 
     const timestamp =
         formatTime();
 
-csvHistory.unshift({
-    time: timestamp,
-    red: red,
-    white: white,
-    combo: red + "-" + white
-});
+    csvHistory.unshift({
+        time:timestamp,
+        red:red,
+        white:white,
+        combo:red+"-"+white
+    });
 
     rollHistory.unshift(
-      "<span class='timestamp'>" +
-      timestamp +
-      "</span> " +
-      red +
-      "-" +
-      white
+        "<span class='timestamp'>" +
+        timestamp +
+        "</span> " +
+        red +
+        "-" +
+        white
     );
 
-    if(rollHistory.length > 50)
-    {
+    if(
+        rollHistory.length > 50
+    ){
         rollHistory.pop();
     }
 
@@ -456,47 +399,49 @@ csvHistory.unshift({
     updateComboTable();
 }
 
-function rollDice()
-{
+function rollDice(){
+
     const redDie =
         document.getElementById(
-            "redDie");
+            "redDie"
+        );
 
     const whiteDie =
         document.getElementById(
-            "whiteDie");
+            "whiteDie"
+        );
 
     redDie.classList.add(
-        "rolling");
+        "rolling"
+    );
 
     whiteDie.classList.add(
-        "rolling");
+        "rolling"
+    );
 
-    if(soundToggle.checked)
-    {
-        rollSound.currentTime = 0;
+    if(soundToggle.checked){
+        rollSound.currentTime=0;
         rollSound.play();
     }
 
     const rolling =
-    setInterval(function(){
+        setInterval(function(){
 
-        redDie.src =
+            redDie.src =
             "images/red" +
             rollSecureDie() +
             ".png";
 
-        whiteDie.src =
+            whiteDie.src =
             "images/white" +
             rollSecureDie() +
             ".png";
 
-    },50);
+        },50);
 
     setTimeout(function(){
 
-        clearInterval(
-            rolling);
+        clearInterval(rolling);
 
         const red =
             rollSecureDie();
@@ -505,30 +450,29 @@ function rollDice()
             rollSecureDie();
 
         redDie.src =
-            "images/red" +
-            red +
-            ".png";
+        "images/red"+red+".png";
 
         whiteDie.src =
-            "images/white" +
-            white +
-            ".png";
+        "images/white"+white+".png";
 
         recordRoll(
             red,
-            white);
+            white
+        );
 
         redDie.classList.remove(
-            "rolling");
+            "rolling"
+        );
 
         whiteDie.classList.remove(
-            "rolling");
+            "rolling"
+        );
 
     },750);
 }
 
-async function autoRoll(count)
-{
+async function autoRoll(count){
+
     const progressContainer =
         document.getElementById(
             "progressContainer"
@@ -542,40 +486,21 @@ async function autoRoll(count)
     progressContainer.style.display =
         "block";
 
-    progressBar.style.width =
-        "0%";
+    for(let i=0;i<count;i++){
 
-    const batchSize = 1000;
-
-    for(
-        let i = 0;
-        i < count;
-        i++
-    )
-    {
         recordRoll(
             rollSecureDie(),
             rollSecureDie()
         );
 
-        if(
-            i % batchSize === 0
-        )
-        {
-            const percent =
-                ((i + 1)
-                / count)
-                * 100;
+        if(i % 1000 === 0){
 
             progressBar.style.width =
-                percent + "%";
+            ((i+1)/count*100)
+            + "%";
 
             await new Promise(
-                resolve =>
-                setTimeout(
-                    resolve,
-                    1
-                )
+                r => setTimeout(r,1)
             );
         }
     }
@@ -588,6 +513,9 @@ async function autoRoll(count)
         progressContainer.style.display =
             "none";
 
+        progressBar.style.width =
+            "0%";
+
     },1000);
 
     alert(
@@ -597,9 +525,9 @@ async function autoRoll(count)
     );
 }
 
-function clearLog()
-{
-    rollHistory = [];
+function clearLog(){
+
+    rollHistory=[];
 
     document.getElementById(
         "logTicker"
@@ -607,98 +535,74 @@ function clearLog()
         "No rolls yet.";
 }
 
-function resetStats()
-{
+function resetStats(){
+
     if(
         !confirm(
-        "Reset all statistics and roll history?"
+        "Reset all statistics?"
         )
-    )
-    {
+    ){
         return;
     }
 
-    totalRolls = 0;
+    totalRolls=0;
+    redTotal=0;
+    whiteTotal=0;
 
-    redTotal = 0;
+    rollHistory=[];
+    csvHistory=[];
 
-    whiteTotal = 0;
-
-    rollHistory = [];
-
-    csvHistory = [];
-
-    for(let r=1;r<=6;r++)
-    {
-        for(let w=1;w<=6;w++)
-        {
+    for(let r=1;r<=6;r++){
+        for(let w=1;w<=6;w++){
             comboStats[
-                r + "-" + w
-            ] = 0;
+                r+"-"+w
+            ]=0;
         }
     }
 
-    document.getElementById(
-        "logTicker"
-    ).innerHTML =
-        "No rolls yet.";
-
-    document.getElementById(
-        "totalRolls"
-    ).innerText = "0";
-
-    document.getElementById(
-        "redAverage"
-    ).innerText = "0.00";
-
-    document.getElementById(
-        "whiteAverage"
-    ).innerText = "0.00";
-
+    clearLog();
+    updateStats();
     updateComboTable();
-
-    alert(
-        "Statistics reset."
-    );
 }
 
-function exportCSV()
-{
-    let csv =
-        "Timestamp,Red Die,White Die,Combination\n";
+function exportCSV(){
 
-    csvHistory.forEach(function(row)
-    {
-        csv +=
-            '"' + row.time + '",' +
+    let csv =
+    "Timestamp,Red Die,White Die,Combination\n";
+
+    csvHistory.forEach(
+        function(row){
+
+            csv +=
+            row.time + "," +
             row.red + "," +
             row.white + "," +
-            '"' + row.combo + '"' +
-            "\n";
-    });
+            row.combo + "\n";
+        }
+    );
 
     const blob =
         new Blob(
             [csv],
-            { type: "text/csv" }
+            {type:"text/csv"}
         );
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
-    link.href = url;
+    link.href=url;
 
-    link.download =
-        "APBA_Roll_History.csv";
-
-    document.body.appendChild(link);
+    link.download=
+    "APBA_Roll_History.csv";
 
     link.click();
-
-    document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
 }
@@ -707,31 +611,33 @@ document.getElementById(
     "secretBall"
 ).addEventListener(
     "click",
-    function(event)
-    {
+    function(event){
+
         if(
             event.ctrlKey &&
             event.shiftKey
-        )
-        {
+        ){
             launchAutoRollPrompt();
             return;
         }
 
         tapCount++;
 
-        clearTimeout(tapTimer);
+        clearTimeout(
+            tapTimer
+        );
 
-        tapTimer =
-            setTimeout(function(){
+        tapTimer=
+        setTimeout(
+            function(){
+                tapCount=0;
+            },
+            1000
+        );
 
-                tapCount = 0;
+        if(tapCount===3){
 
-            },1000);
-
-        if(tapCount === 3)
-        {
-            tapCount = 0;
+            tapCount=0;
 
             launchAutoRollPrompt();
         }

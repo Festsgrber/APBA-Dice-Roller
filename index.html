@@ -10,39 +10,122 @@
 body{
     text-align:center;
     font-family:Arial, sans-serif;
-    background-color:#1b5e20;
+    background-color:#101010;
     color:white;
-    margin-top:50px;
+    margin-top:20px;
 }
 
 h1{
-    margin-bottom:30px;
+    margin-bottom:20px;
+}
+
+#fieldArea{
+
+    background-image:url('images/baseball-field.jpg');
+
+    background-size:cover;
+    background-position:bottom;
+
+    width:90%;
+
+    margin-left:auto;
+    margin-right:auto;
+
+    margin-top:10px;
+
+    padding-top:90px;
+    padding-bottom:90px;
+
+    border-radius:20px;
+
+    box-shadow:0 0 20px rgba(0,0,0,.6);
+}
+
+#overlay{
+
+    background-color:rgba(0,0,0,.35);
+
+    padding-top:20px;
+    padding-bottom:20px;
+
+    border-radius:20px;
 }
 
 #diceContainer{
+
     margin-bottom:30px;
 }
 
 #redDie{
+
     width:200px;
+
+    transform:rotate(-8deg);
+
+    filter:drop-shadow(
+        10px 10px 10px rgba(0,0,0,.6));
 }
 
 #whiteDie{
+
     width:150px;
+
     margin-left:20px;
-    vertical-align:middle;
+
+    transform:rotate(8deg);
+
+    filter:drop-shadow(
+        8px 8px 8px rgba(0,0,0,.6));
 }
 
 button{
+
     font-size:24px;
-    padding:15px 25px;
+
+    padding:12px 24px;
+
     border:none;
+
     border-radius:10px;
+
     cursor:pointer;
 }
 
 button:hover{
+
     background-color:#dddddd;
+}
+
+label{
+
+    font-size:18px;
+}
+
+@keyframes rollAnimation {
+
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    25% {
+        transform: rotate(-20deg) scale(1.1);
+    }
+
+    50% {
+        transform: rotate(20deg) scale(1.15);
+    }
+
+    75% {
+        transform: rotate(-10deg) scale(1.1);
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+}
+
+.rolling {
+    animation: rollAnimation 2.5s ease;
 }
 
 </style>
@@ -52,6 +135,10 @@ button:hover{
 <body>
 
 <h1>⚾ APBA Dice Roller</h1>
+
+<div id="fieldArea">
+
+<div id="overlay">
 
 <div id="diceContainer">
 
@@ -63,25 +150,92 @@ button:hover{
 
 </div>
 
+<label>
+
+<input
+    type="checkbox"
+    id="soundToggle"
+    checked>
+
+Sound Effects
+
+</label>
+
+<br><br>
+
 <button onclick="rollDice()">
+
 Roll Dice
+
 </button>
+
+</div>
+
+</div>
 
 <script>
 
+const rollSound =
+new Audio("sounds/dice-roll.mp3");
+
 function rollDice()
 {
-    let red =
-      Math.floor(Math.random()*6)+1;
+    const redDie =
+        document.getElementById("redDie");
 
-    let white =
-      Math.floor(Math.random()*6)+1;
+    const whiteDie =
+        document.getElementById("whiteDie");
 
-    document.getElementById("redDie").src =
-      "images/red" + red + ".png";
+    redDie.classList.add("rolling");
+    whiteDie.classList.add("rolling");
 
-    document.getElementById("whiteDie").src =
-      "images/white" + white + ".png";
+    if(document.getElementById("soundToggle").checked)
+    {
+        rollSound.currentTime = 0;
+        rollSound.play();
+    }
+
+    let animationCounter = 0;
+
+    const rolling =
+        setInterval(function(){
+
+            let tempRed =
+                Math.floor(Math.random() * 6) + 1;
+
+            let tempWhite =
+                Math.floor(Math.random() * 6) + 1;
+
+            redDie.src =
+                "images/red" + tempRed + ".png";
+
+            whiteDie.src =
+                "images/white" + tempWhite + ".png";
+
+            animationCounter++;
+
+        },75);
+
+    setTimeout(function(){
+
+        clearInterval(rolling);
+
+        let finalRed =
+            Math.floor(Math.random() * 6) + 1;
+
+        let finalWhite =
+            Math.floor(Math.random() * 6) + 1;
+
+        redDie.src =
+            "images/red" + finalRed + ".png";
+
+        whiteDie.src =
+            "images/white" + finalWhite + ".png";
+
+        redDie.classList.remove("rolling");
+        whiteDie.classList.remove("rolling");
+
+    },600);
 }
 
 </script>

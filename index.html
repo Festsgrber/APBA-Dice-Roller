@@ -1,165 +1,123 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <title>APBA Dice Roller</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 
 body{
-    text-align:center;
-    font-family:Arial, sans-serif;
-    background-color:#101010;
+    background:#101010;
     color:white;
-    margin-top:20px;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin:20px;
 }
 
-h1{
-    margin-bottom:20px;
+#secretBall{
+    cursor:pointer;
+    user-select:none;
 }
 
 #fieldArea{
+    width:90%;
+    margin:40px auto;
+    border-radius:20px;
+    overflow:hidden;
 
     background-image:url('images/baseball-field.jpg');
-
     background-size:cover;
-    background-position:bottom
-;
-
-    width:90%;
-
-    margin-left:auto;
-    margin-right:auto;
-
-    margin-top:50px;
-
-    padding-top:80px;
-    padding-bottom:80px;
-
-    border-radius:20px;
-
-    box-shadow:0 0 20px rgba(0,0,0,.6);
+    background-position:bottom;
 }
 
 #overlay{
-
-    background-color:rgba(0,0,0,.35);
-
-    padding-top:30px;
-    padding-bottom:30px;
-
-    border-radius:20px;
-}
-
-#diceContainer{
-    margin-bottom:30px;
+    background:rgba(0,0,0,.35);
+    padding:60px 20px;
 }
 
 #redDie{
-
     width:200px;
-
-    transform:rotate(-8deg);
-
-    filter:drop-shadow(
-        10px 10px 10px rgba(0,0,0,.6));
+    filter:drop-shadow(10px 10px 10px rgba(0,0,0,.6));
 }
 
 #whiteDie{
-
     width:150px;
-
     margin-left:20px;
-
-    transform:rotate(8deg);
-
-    filter:drop-shadow(
-        8px 8px 8px rgba(0,0,0,.6));
+    filter:drop-shadow(8px 8px 8px rgba(0,0,0,.6));
 }
 
 button{
-
     font-size:20px;
-
-    padding:12px 24px;
-
-    border:none;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
+    padding:10px 20px;
     margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
 }
 
-button:hover{
-    background-color:#dddddd;
+#statsPanel{
+    width:500px;
+    max-width:90%;
+    margin:20px auto;
+    text-align:left;
+    background:rgba(255,255,255,.08);
+    padding:15px;
+    border-radius:10px;
 }
-
-label{
-    font-size:18px;
-}
-
-@keyframes rollAnimation {
-
-    0% {
-        transform: rotate(0deg) scale(1);
-    }
-
-    25% {
-        transform: rotate(-20deg) scale(1.1);
-    }
-
-    50% {
-        transform: rotate(20deg) scale(1.15);
-    }
-
-    75% {
-        transform: rotate(-10deg) scale(1.1);
-    }
-
-    100% {
-        transform: rotate(0deg) scale(1);
-    }
-}
-
-.rolling{
-    animation: rollAnimation .5s ease;
-}
-
-/* Bottom Scoreboard Log */
 
 #logWrapper{
-
     width:95%;
-    margin:30px auto;
-
+    margin:20px auto;
     background:black;
-
-    border:2px solid #444;
-
     border-radius:10px;
-
     padding:10px;
-
-    overflow:hidden;
-}
-
-#logTicker{
-
+    overflow-x:auto;
     white-space:nowrap;
-
-    font-size:20px;
-
-    color:white;
-
-    text-align:left;
 }
 
 .timestamp{
     color:yellow;
     font-weight:bold;
+}
+
+table{
+    margin:auto;
+    border-collapse:collapse;
+}
+
+td{
+    border:1px solid #555;
+    padding:5px;
+    min-width:70px;
+}
+
+@keyframes rollAnimation{
+
+    0%{
+        transform:rotate(0deg) scale(1);
+    }
+
+    25%{
+        transform:rotate(-15deg) scale(1.1);
+    }
+
+    50%{
+        transform:rotate(15deg) scale(1.15);
+    }
+
+    75%{
+        transform:rotate(-10deg) scale(1.1);
+    }
+
+    100%{
+        transform:rotate(0deg) scale(1);
+    }
+}
+
+.rolling{
+    animation:rollAnimation .75s ease;
 }
 
 </style>
@@ -168,28 +126,31 @@ label{
 
 <body>
 
-<h1>⚾ APBA Dice Roller</h1>
+<h1>
+<span id="secretBall">⚾</span>
+APBA Dice Roller
+</h1>
 
 <div id="fieldArea">
 
 <div id="overlay">
 
-<div id="diceContainer">
+<div>
 
-<img id="redDie"
-     src="images/red1.png">
+<img id="redDie" src="images/red1.png">
 
-<img id="whiteDie"
-     src="images/white1.png">
+<img id="whiteDie" src="images/white1.png">
 
 </div>
+
+<br>
 
 <label>
 
 <input
-    type="checkbox"
-    id="soundToggle"
-    checked>
+type="checkbox"
+id="soundToggle"
+checked>
 
 Sound Effects
 
@@ -205,15 +166,44 @@ Roll Dice
 
 </div>
 
+<div id="statsPanel">
+
+<b>Statistics</b>
+
+<br><br>
+
+Total Rolls:
+<span id="totalRolls">0</span>
+
+<br>
+
+Red Average:
+<span id="redAverage">0.00</span>
+
+<br>
+
+White Average:
+<span id="whiteAverage">0.00</span>
+
+</div>
+
 <div id="logWrapper">
-    <div id="logTicker">
-        No rolls yet.
-    </div>
+
+<div id="logTicker">
+
+No rolls yet.
+
+</div>
+
 </div>
 
 <button onclick="clearLog()">
 Clear Log
 </button>
+
+<br><br>
+
+<div id="comboTable"></div>
 
 <script>
 
@@ -221,6 +211,22 @@ const rollSound =
 new Audio("sounds/dice-roll.mp3");
 
 let rollHistory = [];
+
+let totalRolls = 0;
+
+let redTotal = 0;
+
+let whiteTotal = 0;
+
+const comboStats = {};
+
+for(let r=1;r<=6;r++)
+{
+    for(let w=1;w<=6;w++)
+    {
+        comboStats[r + "-" + w] = 0;
+    }
+}
 
 const soundToggle =
 document.getElementById("soundToggle");
@@ -239,18 +245,60 @@ function()
     );
 });
 
+function rollSecureDie()
+{
+    const limit =
+        Math.floor(
+            4294967296 / 6
+        ) * 6;
+
+    const array =
+        new Uint32Array(1);
+
+    while(true)
+    {
+        window.crypto.getRandomValues(
+            array
+        );
+
+        if(array[0] < limit)
+        {
+            return (
+                array[0] % 6
+            ) + 1;
+        }
+    }
+}
+
 function formatTime()
 {
-    const now = new Date();
+    return new Date()
+        .toLocaleTimeString();
+}
 
-    return now.toLocaleTimeString(
-        [],
-        {
-            hour:'numeric',
-            minute:'2-digit',
-            second:'2-digit'
-        }
-    );
+function updateStats()
+{
+    document.getElementById(
+        "totalRolls"
+    ).innerText =
+        totalRolls;
+
+    if(totalRolls > 0)
+    {
+        document.getElementById(
+            "redAverage"
+        ).innerText =
+        (redTotal /
+         totalRolls)
+         .toFixed(2);
+
+        document.getElementById(
+            "whiteAverage"
+        ).innerText =
+        (whiteTotal /
+         totalRolls)
+         .toFixed(2);
+    }
 }
 
 function updateLog()
@@ -259,20 +307,92 @@ function updateLog()
         "logTicker"
     ).innerHTML =
         rollHistory.join(
-            " &nbsp;&nbsp;&nbsp; ⚾ &nbsp;&nbsp;&nbsp; "
+            "&nbsp;&nbsp;⚾&nbsp;&nbsp;"
         );
+}
+
+function updateComboTable()
+{
+    let html =
+    "<h2>Combination Frequency</h2><table>";
+
+    for(let r=1;r<=6;r++)
+    {
+        html += "<tr>";
+
+        for(let w=1;w<=6;w++)
+        {
+            html +=
+            "<td>" +
+            r +
+            "-" +
+            w +
+            "<br>" +
+            comboStats[
+            r+"-"+w] +
+            "</td>";
+        }
+
+        html += "</tr>";
+    }
+
+    html += "</table>";
+
+    document.getElementById(
+        "comboTable"
+    ).innerHTML =
+        html;
+}
+
+function recordRoll(red,white)
+{
+    totalRolls++;
+
+    redTotal += red;
+
+    whiteTotal += white;
+
+    comboStats[
+        red + "-" + white
+    ]++;
+
+    const timestamp =
+        formatTime();
+
+    rollHistory.unshift(
+      "<span class='timestamp'>" +
+      timestamp +
+      "</span> " +
+      red +
+      "-" +
+      white
+    );
+
+    if(rollHistory.length > 50)
+    {
+        rollHistory.pop();
+    }
+
+    updateStats();
+    updateLog();
+    updateComboTable();
 }
 
 function rollDice()
 {
     const redDie =
-        document.getElementById("redDie");
+        document.getElementById(
+            "redDie");
 
     const whiteDie =
-        document.getElementById("whiteDie");
+        document.getElementById(
+            "whiteDie");
 
-    redDie.classList.add("rolling");
-    whiteDie.classList.add("rolling");
+    redDie.classList.add(
+        "rolling");
+
+    whiteDie.classList.add(
+        "rolling");
 
     if(soundToggle.checked)
     {
@@ -281,61 +401,68 @@ function rollDice()
     }
 
     const rolling =
-        setInterval(function(){
+    setInterval(function(){
 
-            let tempRed =
-                Math.floor(Math.random()*6)+1;
+        redDie.src =
+            "images/red" +
+            rollSecureDie() +
+            ".png";
 
-            let tempWhite =
-                Math.floor(Math.random()*6)+1;
+        whiteDie.src =
+            "images/white" +
+            rollSecureDie() +
+            ".png";
 
-            redDie.src =
-                "images/red" + tempRed + ".png";
-
-            whiteDie.src =
-                "images/white" + tempWhite + ".png";
-
-        },100);
+    },50);
 
     setTimeout(function(){
 
-        clearInterval(rolling);
+        clearInterval(
+            rolling);
 
-        let finalRed =
-            Math.floor(Math.random()*6)+1;
+        const red =
+            rollSecureDie();
 
-        let finalWhite =
-            Math.floor(Math.random()*6)+1;
+        const white =
+            rollSecureDie();
 
         redDie.src =
-            "images/red" + finalRed + ".png";
+            "images/red" +
+            red +
+            ".png";
 
         whiteDie.src =
-            "images/white" + finalWhite + ".png";
+            "images/white" +
+            white +
+            ".png";
 
-        const timestamp =
-            formatTime();
+        recordRoll(
+            red,
+            white);
 
-        rollHistory.unshift(
-            "<span class='timestamp'>" +
-            timestamp +
-            "</span> " +
-            finalRed +
-            "-" +
-            finalWhite
+        redDie.classList.remove(
+            "rolling");
+
+        whiteDie.classList.remove(
+            "rolling");
+
+    },750);
+}
+
+function autoRoll(count)
+{
+    for(let i=0;i<count;i++)
+    {
+        recordRoll(
+            rollSecureDie(),
+            rollSecureDie()
         );
+    }
 
-        if(rollHistory.length > 25)
-        {
-            rollHistory.pop();
-        }
-
-        updateLog();
-
-        redDie.classList.remove("rolling");
-        whiteDie.classList.remove("rolling");
-
-    },1500);
+    alert(
+        count.toLocaleString() +
+        " rolls completed."
+    );
 }
 
 function clearLog()
@@ -348,8 +475,42 @@ function clearLog()
         "No rolls yet.";
 }
 
+document.getElementById(
+    "secretBall"
+).addEventListener(
+    "click",
+    function(event)
+    {
+        if(
+            !event.ctrlKey ||
+            !event.shiftKey
+        )
+        {
+            return;
+        }
+
+        const count =
+        parseInt(
+            prompt(
+                "Number of rolls?"
+            )
+        );
+
+        if(
+            isNaN(count) ||
+            count < 1
+        )
+        {
+            return;
+        }
+
+        autoRoll(count);
+    }
+);
+
+updateComboTable();
+
 </script>
 
 </body>
-
 </html>
